@@ -2,9 +2,9 @@
   "id": "34cfa730-cb47-11e7-aeb5-fd386a6d4946",
   "name": "NssmManage",
   "friendlyName": "Manage NSSM Service",
-  "description": "Install and edit windows service through nssm.",
+  "description": "Install and edit windows services through nssm.",
   "author": "cnatan",
-  "helpMarkDown": "Install and edit windows service through nssm.",
+  "helpMarkDown": "Install and edit windows services through nssm. Fields leave empty will be reseted to nssm default.",
   "category": "Utility",
   "visibility": [
     "Build",
@@ -13,11 +13,43 @@
   "demands": [],
   "version": {
     "Major": "1",
-    "Minor": "0",
-    "Patch": "3"
+    "Minor": "1",
+    "Patch": "4"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "NssmManage $(message)",
+  "groups":[
+    {
+      "name" : "application",
+      "displayName": "Application",
+      "isExpanded": true
+    },
+    {
+      "name" : "details",
+      "displayName": "Details",
+      "isExpanded": false
+    },
+    {
+      "name" : "logOn",
+      "displayName": "LogOn",
+      "isExpanded": false
+    },
+    {
+      "name" : "io",
+      "displayName": "I/O",
+      "isExpanded": false
+    },
+    {
+      "name" : "fileRotation",
+      "displayName": "FileRotation",
+      "isExpanded": false
+    },
+    {
+      "name" : "installationAndExecution",
+      "displayName": "NSSM installation and execution",
+      "isExpanded": false
+    }
+  ],
   "inputs": [
     {
       "name": "cwd",
@@ -28,19 +60,12 @@
       "helpMarkDown": "Current working directory when nssm is run."
     },
     {
-      "name": "nssmpath",
-      "type": "filePath",
-      "label": "Nssm executable path",
-      "defaultValue": "",
-      "required": false,
-      "helpMarkDown": "Nssm executable path if not in PATH variable."
-    },
-    {
       "name": "servicename",
       "type": "string",
       "label": "Service Name",
       "defaultValue": "",
       "required": true,
+      "groupName": "application",
       "helpMarkDown": "Windows service name."
     },
     {
@@ -49,6 +74,7 @@
       "label": "Application path",
       "defaultValue": "",
       "required": true,
+      "groupName": "application",
       "helpMarkDown": "Application or script to be runned as service."
     },
     {
@@ -57,6 +83,7 @@
       "label": "Startup directory",
       "defaultValue": "",
       "required": false,
+      "groupName": "application",
       "helpMarkDown": "Startup directory of the windows service. Default is the ApplicationPath directory."
     },
     {
@@ -65,6 +92,7 @@
       "label": "Application Arguments",
       "defaultValue": "",
       "required": false,
+      "groupName": "application",
       "helpMarkDown": "Arguments to be passed to application runned as service."
     },
     {
@@ -73,6 +101,7 @@
       "label": "Service Display Name",
       "defaultValue": "",
       "required": false,
+      "groupName": "details",
       "helpMarkDown": "The windows service display name."
     },
     {
@@ -81,6 +110,7 @@
       "label": "Service Description",
       "defaultValue": "",
       "required": false,
+      "groupName": "details",
       "helpMarkDown": "The windows service description."
     },
     {
@@ -89,6 +119,7 @@
       "label": "Service LogOn Account",
       "defaultValue": "",
       "required": false,
+      "groupName": "logOn",
       "helpMarkDown": "The windows service account to run the service. Default is system account."
     },
     {
@@ -97,6 +128,7 @@
       "label": "Service LogOn Account Password",
       "defaultValue": "",
       "required": false,
+      "groupName": "logOn",
       "helpMarkDown": "The windows service account password."
     },
     {
@@ -105,6 +137,7 @@
       "label": "I/O stdout file",
       "defaultValue": "",
       "required": false,
+      "groupName": "io",
       "helpMarkDown": "Path of file to redirect application stdout."
     },
     {
@@ -113,6 +146,7 @@
       "label": "I/O stderr file",
       "defaultValue": "",
       "required": false,
+      "groupName": "io",
       "helpMarkDown": "Path of file to redirect application stderr."
     },
     {
@@ -121,6 +155,7 @@
       "label": "Rotate stdout/stderr files",
       "defaultValue": "",
       "required": false,
+      "groupName": "fileRotation",
       "helpMarkDown": "Whether rotate log file generated from stdout/stderr redirect."
     },
     {
@@ -129,6 +164,7 @@
       "label": "Rotate files while running",
       "defaultValue": "",
       "required": false,
+      "groupName": "fileRotation",
       "helpMarkDown": "Whether rotate log file while service is running. Default is only on service start."
     },
     {
@@ -137,6 +173,7 @@
       "label": "Rotate files older than X seconds",
       "defaultValue": "0",
       "required": false,
+      "groupName": "fileRotation",
       "helpMarkDown": "Restrict rotation to files older than X seconds."
     },
     {
@@ -145,7 +182,17 @@
       "label": "Rotate files bigger than X bytes",
       "defaultValue": "0",
       "required": false,
+      "groupName": "fileRotation",
       "helpMarkDown": "Restrict rotation to files bigger than X bytes."
+    },
+    {
+      "name": "nssmpath",
+      "type": "filePath",
+      "label": "Nssm executable path",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "installationAndExecution",
+      "helpMarkDown": "Nssm executable path if not in PATH variable."
     }
   ],
   "execution": {
