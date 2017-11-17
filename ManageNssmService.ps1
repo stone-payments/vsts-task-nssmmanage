@@ -108,9 +108,17 @@ try {
     }
     Write-Host "nssm path '$nssmPath'"
 
-    # Install service if not found.
+    # Get service desired state.
     $serviceName = Get-VstsInput -Name "servicename"
-    $appPath = Get-VstsInput -Name "apppath"
+    $serviceState = Get-VstsInput -Name "serviceState" -Require
+    # If is a service removal abort settings update.
+    if($serviceState -eq "absent"){
+        Invoke-VstsTool -FileName $nssmPath -Arguments "remove $serviceName confirm"
+        return
+    }
+
+    # Install service if not found.
+    $appPath = Get-VstsInput -Name "apppath" -Require
     if(!(Get-Service $serviceName -ErrorAction SilentlyContinue)){
         Install-Service $nssmPath $serviceName $appPath
     }
@@ -139,6 +147,24 @@ try {
     $rotatePerBytes = Get-VstsInput -Name "rotateperbytes" -AsInt
     Set-Logs $nssmPath $serviceName $outFile $errFile $rotate $rotateRunning $rotatePerSeconds $rotatePerBytes
 
+    # Apply service desired state.
+    switch ($serviceState) {
+        "started" {
+            if((get-service ExampleService).Status -ne "Running"){
+                Invoke-VstsTool -FileName $nssmPath -Arguments "start $serviceName "
+            }
+        }
+        "restarted" {
+            Invoke-VstsTool -FileName $nssmPath -Arguments "restart $serviceName"
+        }
+        "stopped"{
+            Invoke-VstsTool -FileName $nssmPath -Arguments "stop $serviceName"
+        }
+        Default {
+            # Should not execute this. if happen some validation is missing.
+            Write-VstsTaskWarning "No service state specified."
+        }
+    }
 } finally {
     Trace-VstsLeavingInvocation $MyInvocation
 }

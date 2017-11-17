@@ -12,9 +12,9 @@
   ],
   "demands": [],
   "version": {
-    "Major": "1",
-    "Minor": "1",
-    "Patch": "4"
+    "Major": "2",
+    "Minor": "0",
+    "Patch": "3"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "NssmManage $(message)",
@@ -60,6 +60,24 @@
       "helpMarkDown": "Current working directory when nssm is run."
     },
     {
+      "name": "serviceState",
+      "type": "pickList",
+      "label": "Desired Service State",
+      "helpMarkDown": "Service state after applying settings.",
+      "defaultValue": "stopped",
+      "required": true,
+      "options": {
+        "stopped": "Stopped",
+        "started": "Started",
+        "restarted": "Restarted",
+        "absent": "Absent"
+      },
+      "properties": {
+        "EditableOptions": "false",
+        "PopulateDefaultValue": "true"
+      }
+    },
+    {
       "name": "servicename",
       "type": "string",
       "label": "Service Name",
@@ -73,7 +91,7 @@
       "type": "string",
       "label": "Application path",
       "defaultValue": "",
-      "required": true,
+      "required": false,
       "groupName": "application",
       "helpMarkDown": "Application or script to be runned as service."
     },
