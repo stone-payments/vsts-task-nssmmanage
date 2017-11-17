@@ -1,0 +1,60 @@
+{
+  "id": "34cfa730-cb47-11e7-aeb5-fd386a6d4946",
+  "name": "NssmManage",
+  "friendlyName": "Manage NSSM Service",
+  "description": "Install and edit windows service through nssm.",
+  "author": "cnatan",
+  "helpMarkDown": "Install and edit windows service through nssm.",
+  "category": "Utility",
+  "visibility": [
+    "Build",
+    "Release"
+  ],
+  "demands": [],
+  "version": {
+    "Major": "0",
+    "Minor": "1",
+    "Patch": "4"
+  },
+  "minimumAgentVersion": "1.95.0",
+  "instanceNameFormat": "NssmManage $(message)",
+  "inputs": [
+    {
+      "name": "cwd",
+      "type": "filePath",
+      "label": "Working Directory",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Current working directory when nssm is run."
+    },
+    {
+      "name": "nssmpath",
+      "type": "filePath",
+      "label": "Nssm executable path.",
+      "defaultValue": "",
+      "required": false,
+      "helpMarkDown": "Nssm executable path if not in PATH variable."
+    },
+    {
+      "name": "servicename",
+      "type": "string",
+      "label": "Service Name.",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Windows service name."
+    },
+    {
+      "name": "apppath",
+      "type": "string",
+      "label": "Application path.",
+      "defaultValue": "",
+      "required": true,
+      "helpMarkDown": "Application or script to be runned as service."
+    }
+  ],
+  "execution": {
+    "PowerShell3": {
+      "target": "ManageNssmService.ps1"
+    }
+  }
+}
