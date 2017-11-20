@@ -1,8 +1,17 @@
 [CmdletBinding()]
 param()
 
-function Install-Service ($nssmPath, $name, $path) {
-    Invoke-VstsTool -FileName $nssmPath -Arguments "install $name $path"
+function Install-Service ($nssmPath, $name, $path, [bool]$remoteExec, $remoteSession) {
+    if($remoteExec){
+        Write-Host "REMOTE INSTALLING NSSM SERVICE WITH $nssmPath"
+        Invoke-Command -Session $remoteSession -ArgumentList $nssmPath, $name, $path {
+            param($nssmPath, $name, $path)
+            Invoke-Expression "$nssmPath install $name $path"
+        }
+        Write-Host "AFTER REMOTE INSTALLING NSSM SERVICE WITH $nssmPath"
+    }else{
+        Invoke-VstsTool -FileName $nssmPath -Arguments "install $name $path"
+    }
 }
 
 function Set-AppProperties ($nssmPath, $name, $path, $startupDir, $appArgs) {
@@ -89,6 +98,15 @@ function Set-Logs ($nssmPath, $name, $outFile, $errFile, $rotateFiles, $rotateWh
     }
 }
 
+function Get-PSSessionOptions($ignoreCertificate){
+    if($ignoreCertificate){
+        $sessionOptions = (New-PSSessionOption -SkipCACheck -SkipCNCheck -SkipRevocationCheck)
+    }else{
+        $sessionOptions = (New-PSSessionOption)
+    }
+    return $sessionOptions
+}
+
 # For more information on the VSTS Task SDK:
 # https://github.com/Microsoft/vsts-task-lib
 Trace-VstsEnteringInvocation $MyInvocation
@@ -99,13 +117,37 @@ try {
     Write-Verbose "Setting working directory to '$cwd'."
     Set-Location $cwd
 
+    # Check if is a remote execution.
+    $remoteExec = Get-VstsInput -Name "remote" -AsBool
+    if($remoteExec){
+        $machine = Get-VstsInput -Name "Machine" -Require
+        $remoteUser = Get-VstsInput -Name "AdminUserName" -Require
+        $remoteUserPass = Get-VstsInput -Name "AdminPassword" -Require
+        $remoteProtocol = Get-VstsInput -Name "Protocol" -Require
+        $useSSL = ($remoteProtocol -eq "Https")
+        $ignoreCertificate = Get-VstsInput -Name "TestCertificate" -Require -AsBool
+        # Open remote session.
+        $secpasswd = ConvertTo-SecureString $remoteUserPass -AsPlainText -Force
+        $credential = New-Object System.Management.Automation.PSCredential ($remoteUser, $secpasswd)
+        $remoteSession = New-PSSession -ComputerName $machine -Credential $credential -UseSSL:$useSSL -SessionOption (Get-PSSessionOptions $ignoreCertificate)
+    }
+
     # Determine nssm.exe path.
     $nssmPath = Get-VstsInput -Name "nssmpath"
     # If nssm.exe path not specified try to resolve from PATH.
-    if(!(Get-Command $nssmPath -ErrorAction SilentlyContinue)){
-        Write-Host "nssm.exe path not specified trying to resolve."
-        $nssmPath = (Get-Command nssm.exe).Source
+    if($remoteExec){
+        if($nssmPath){
+            $nssmPath = Invoke-Command -Session $remoteSession { 
+                (Get-Command nssm.exe).Source
+            }
+        }
+    }else{
+        if(!(Get-Command $nssmPath -ErrorAction SilentlyContinue)){
+            Write-Host "nssm.exe path not specified trying to resolve."
+            $nssmPath = (Get-Command nssm.exe).Source
+        }
     }
+
     Write-Host "nssm path '$nssmPath'"
 
     # Get service desired state.
@@ -113,15 +155,33 @@ try {
     $serviceState = Get-VstsInput -Name "serviceState" -Require
     # If is a service removal abort settings update.
     if($serviceState -eq "absent"){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "remove $serviceName confirm"
+        if($remoteExec){
+            Invoke-Command -Session $remoteSession {
+                Invoke-Expression "$nssmPath stop $serviceName"
+                Invoke-Expression "$nssmPath remove $serviceName confirm"
+            }
+        }else{
+            Invoke-VstsTool -FileName $nssmPath -Arguments "stop $serviceName"
+            Invoke-VstsTool -FileName $nssmPath -Arguments "remove $serviceName confirm"
+        }
         return
     }
 
     # Install service if not found.
     $appPath = Get-VstsInput -Name "apppath" -Require
-    if(!(Get-Service $serviceName -ErrorAction SilentlyContinue)){
-        Install-Service $nssmPath $serviceName $appPath
+    $installService = $false
+    if($remoteExec){
+        $installService = Invoke-Command -Session $remoteSession { !(Get-Service $serviceName -ErrorAction SilentlyContinue)}
+    }else{
+        if(!(Get-Service $serviceName -ErrorAction SilentlyContinue)){
+            $installService = $true
+        }
     }
+
+    #if($installService){
+        Write-Host "MUST INSTALL SERVICE"
+        Install-Service $nssmPath $serviceName $appPath $remoteExec $remoteSession
+    #}
 
     # Set basic service props.
     $startupDir = Get-VstsInput -Name "startupdir"

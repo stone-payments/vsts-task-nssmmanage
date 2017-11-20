@@ -12,9 +12,9 @@
   ],
   "demands": [],
   "version": {
-    "Major": "2",
-    "Minor": "0",
-    "Patch": "3"
+    "Major": "3",
+    "Minor": "1",
+    "Patch": "15"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "NssmManage $(message)",
@@ -45,6 +45,11 @@
       "isExpanded": false
     },
     {
+      "name" : "remoteExecution",
+      "displayName": "Remote Execution Options",
+      "isExpanded": false
+    },
+    {
       "name" : "installationAndExecution",
       "displayName": "NSSM installation and execution",
       "isExpanded": false
@@ -57,7 +62,7 @@
       "label": "Working Directory",
       "defaultValue": "",
       "required": false,
-      "helpMarkDown": "Current working directory when nssm is run."
+      "helpMarkDown": "Current working directory when nssm is run. Not valid for remote executions."
     },
     {
       "name": "serviceState",
@@ -202,6 +207,69 @@
       "required": false,
       "groupName": "fileRotation",
       "helpMarkDown": "Restrict rotation to files bigger than X bytes."
+    },
+    {
+      "name": "remote",
+      "type": "boolean",
+      "label": "Remote execution through WinRM",
+      "defaultValue": "false",
+      "required": false,
+      "groupName": "remoteExecution",
+      "helpMarkDown": "Execute action in a remote machine instead of the agent."
+    },
+    {
+      "name": "Machine",
+      "type": "string",
+      "label": "Machine",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "remoteExecution",
+      "visibleRule": "remote = true",
+      "helpMarkDown": "Target machine IP or FQDN."
+    },
+    {
+      "name": "AdminUserName",
+      "type": "string",
+      "label": "Admin Login",
+      "defaultValue": "",
+      "required": false,
+      "groupName": "remoteExecution",
+      "visibleRule": "remote = true",
+      "helpMarkDown": "Administrator login for the target machine."
+    },
+    {
+      "name": "AdminPassword",
+      "type": "string",
+      "label": "Password",
+      "defaultValue": "",
+      "required": false,
+      "visibleRule": "remote = true",
+      "groupName": "remoteExecution",
+      "helpMarkDown": "Administrator password for the target machine. <br>It can accept variable defined in Build/Release definitions as '$(passwordVariable)'. <br>You may mark variable type as 'secret' to secure it."
+    },
+    { 
+      "name": "Protocol",
+      "type": "radio",
+      "label": "Protocol",
+      "required": false,
+      "defaultValue": "",
+      "visibleRule": "remote = true",
+      "groupName": "remoteExecution",
+      "options": {
+          "Http": "HTTP",
+          "Https": "HTTPS"
+      },
+      "helpMarkDown": "Select the protocol to use for the WinRM connection with the machine(s). Default is HTTPS."
+    },
+    {
+      "name": "TestCertificate",
+      "type": "boolean",
+      "label": "Test Certificate",
+      "defaultValue": "true",
+      "visibleRule": "Protocol = Https",
+      "required": false,
+      "groupName": "remoteExecution",
+      "helpMarkDown": "Select the option to skip validating the authenticity of the machine's certificate by a trusted certification authority. The parameter is required for the WinRM HTTPS protocol."
     },
     {
       "name": "nssmpath",
