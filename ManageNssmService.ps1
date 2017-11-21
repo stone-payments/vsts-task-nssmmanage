@@ -1,5 +1,5 @@
 [CmdletBinding()]
-param()
+param([switch]$dotSourceOnly)
 
 function Get-PSSessionOptions($ignoreCertificate){
     if($ignoreCertificate){
@@ -29,7 +29,7 @@ function Invoke-RemoteTool ($fileName, $arguments, $remoteSession) {
     Invoke-Command -Session $remoteSession -ArgumentList $fileName, $arguments {
         param($fileName, $arguments)
         Invoke-Expression "$fileName $arguments"
-    }
+    } -ErrorAction Ignore
 }
 
 function Invoke-Tool ($fileName, $arguments, $remoteSession) {
@@ -40,104 +40,91 @@ function Invoke-Tool ($fileName, $arguments, $remoteSession) {
     }
 }
 
-function Install-Service ($nssmPath, $name, $path, [bool]$remoteExec, $remoteSession) {
-    if($remoteExec){
-        Write-Host "REMOTE INSTALLING NSSM SERVICE WITH $nssmPath"
-        Invoke-Command -Session $remoteSession -ArgumentList $nssmPath, $name, $path {
-            param($nssmPath, $name, $path)
-            Invoke-Expression "$nssmPath install $name $path"
-        }
-        Write-Host "AFTER REMOTE INSTALLING NSSM SERVICE WITH $nssmPath"
-    }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "install $name $path"
-    }
-}
-
-function Set-AppProperties ($nssmPath, $name, $path, $startupDir, $appArgs) {
-    Invoke-VstsTool -FileName $nssmPath -Arguments "set $name Application $path"
-
+function Set-NssmAppProperties ($nssmPath, $name, $path, $startupDir, $appArgs, $remoteSession) {
+    Invoke-Tool -FileName $nssmPath -Arguments "set $name Application $path" -RemoteSession $remoteSession
+    
     if($startupDir){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppDirectory $startupDir"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name AppDirectory $startupDir" -RemoteSession $remoteSession
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppDirectory"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppDirectory" -RemoteSession $remoteSession
     }
-
+    
     if($appArgs){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppParameters $appArgs"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name AppParameters $appArgs" -RemoteSession $remoteSession
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppParameters"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppParameters" -RemoteSession $remoteSession
     }
 }
 
-function Set-Details ($nssmPath, $name, $displayName, $description) {
+function Set-NssmDetails ($nssmPath, $name, $displayName, $description, $remoteSession) {
     if($displayName){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name DisplayName $displayName"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name DisplayName $displayName" -RemoteSession $remoteSession
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name DisplayName"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name DisplayName" -RemoteSession $remoteSession
     }
-
+    
     if($description){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name Description $description"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name Description $description" -RemoteSession $remoteSession
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name Description"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name Description" -RemoteSession $remoteSession
     }
 }
 
-function Set-LogOn ($nssmPath, $name, $account, $accountPassword) {
+function Set-NssmLogOn ($nssmPath, $name, $account, $accountPassword, $remoteSession) {
     if($account -and $accountPassword){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name ObjectName  $account $accountPassword"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name ObjectName  $account $accountPassword" -RemoteSession $remoteSession
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name ObjectName"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name ObjectName" -RemoteSession $remoteSession
     }
 }
 
-function Set-Logs ($nssmPath, $name, $outFile, $errFile, $rotateFiles, $rotateWhileRunning, $rotateOlderThanInSeconds, $rotateBiggerThanInBytes) {
+function Set-NssmLogs ($nssmPath, $name, $outFile, $errFile, $rotateFiles, $rotateWhileRunning, $rotateOlderThanInSeconds, $rotateBiggerThanInBytes, $remoteSession) {
     # Define stdout and stderr redirect as same file if stderr not specified.
     if($outFile){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppStdout $outFile"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name AppStdout $outFile" -RemoteSession $remoteSession
         if(!$errFile){
-            Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppStderr $outFile"
+            Invoke-Tool -FileName $nssmPath -Arguments "set $name AppStderr $outFile" -RemoteSession $remoteSession
         }
     }else{
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppStdout"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppStdout" -RemoteSession $remoteSession
     }
-
+    
     if($errFile){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppStderr $errFile"
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name AppStderr $errFile" -RemoteSession $remoteSession
     }else {
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppStderr"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppStderr" -RemoteSession $remoteSession
     }
-
+    
     if($rotateFiles){
-        Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppRotateFiles  1"
-
+        Invoke-Tool -FileName $nssmPath -Arguments "set $name AppRotateFiles  1" -RemoteSession $remoteSession
+        
         if($rotateWhileRunning){
-            Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppRotateOnline 1"
+            Invoke-Tool -FileName $nssmPath -Arguments "set $name AppRotateOnline 1" -RemoteSession $remoteSession
         }else{
-            Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateOnline"
+            Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateOnline" -RemoteSession $remoteSession
         }
-    
+        
         if ($rotateOlderThanInSeconds) {
-            Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppRotateSeconds $rotateOlderThanInSeconds"
+            Invoke-Tool -FileName $nssmPath -Arguments "set $name AppRotateSeconds $rotateOlderThanInSeconds" -RemoteSession $remoteSession
         }else{
-            Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateSeconds"
+            Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateSeconds" -RemoteSession $remoteSession
         }
-    
+        
         if ($rotateBiggerThanInBytes) {
-            Invoke-VstsTool -FileName $nssmPath -Arguments "set $name AppRotateBytes  $rotateBiggerThanInBytes"
+            Invoke-Tool -FileName $nssmPath -Arguments "set $name AppRotateBytes  $rotateBiggerThanInBytes" -RemoteSession $remoteSession
         }else{
-            Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateBytes"
+            Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateBytes" -RemoteSession $remoteSession
         }
     }else{
         # Reset all file rotation settings.
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateFiles"
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateOnline"
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateSeconds"
-        Invoke-VstsTool -FileName $nssmPath -Arguments "reset $name AppRotateBytes"
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateFiles" -RemoteSession $remoteSession
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateOnline" -RemoteSession $remoteSession
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateSeconds" -RemoteSession $remoteSession
+        Invoke-Tool -FileName $nssmPath -Arguments "reset $name AppRotateBytes" -RemoteSession $remoteSession
     }
 }
 
-function Resolve-NssmPath ($remoteExec, $remoteSession, $nssmPath) {
+function Resolve-NssmPath ($nssmPath, $remoteSession) {
     $scriptBlock = {
         param($nssmPath)
         # If path not specified or valid try to resolve from PATH.
@@ -150,51 +137,64 @@ function Resolve-NssmPath ($remoteExec, $remoteSession, $nssmPath) {
     }
 
     # Run path resolution remotely or local.
-    if($remoteExec){
+    if($remoteSession){
         $validPath = Invoke-Command -Session $remoteSession -ArgumentList $nssmPath -ScriptBlock $scriptBlock
     }else{
         $validPath = &$scriptBlock $nssmPath
     }
-
+    
     return $validPath
 }
 
-function Remove-NssmService ($remoteExec, $remoteSession, $nssmPath, $serviceName) {
+function Install-NssmService ($nssmPath, $name, $path, $remoteSession) {
+    Invoke-Tool -FileName $nssmPath -Arguments "install $name $path" -RemoteSession $remoteSession
+}
+
+function Remove-NssmService ($nssmPath, $serviceName, $remoteSession) {
+    #TODO: check if service exists to avoid nssm error msg in VSTS console.
+    #TODO: check if service stopped to avoid abort or ignore stop error.
     Invoke-Tool -FileName $nssmPath -Arguments "stop $serviceName" -RemoteSession $remoteSession
     Invoke-Tool -FileName $nssmPath -Arguments "remove $serviceName confirm" -RemoteSession $remoteSession
 }
 
-function Set-NssmService ($remoteExec, $remoteSession, $nssmPath, $serviceName, $serviceState, $workingDir) {
-    # Install service if not found.
-    $appPath = Get-VstsInput -Name "apppath" -Require
-    $installService = $false
-    if($remoteExec){
-        $installService = Invoke-Command -Session $remoteSession { !(Get-Service $serviceName -ErrorAction SilentlyContinue)}
-    }else{
-        if(!(Get-Service $serviceName -ErrorAction SilentlyContinue)){
-            $installService = $true
-        }
+function Get-NssmService($serviceName, $remoteSession){
+    $scriptBlock = {
+        param($serviceName)
+        !(Get-Service $serviceName -ErrorAction SilentlyContinue)
     }
 
-    #if($installService){
-        Write-Host "MUST INSTALL SERVICE"
-        Install-Service $nssmPath $serviceName $appPath $remoteExec $remoteSession
-    #}
+    if ($remoteSession) {
+        Invoke-Command -Session $remoteSession -ArgumentList $serviceName -ScriptBlock $scriptBlock
+    }else {
+        &$scriptBlock $serviceName
+    }
+}
+
+function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession) {
+
+    # Install service if not found.
+    $appPath = Get-VstsInput -Name "apppath" -Require
+    $installService = Get-NssmService $serviceName $remoteSession
+
+    if($installService){
+        Write-Host "Service not already installed. Installing service."
+        Install-NssmService $nssmPath $serviceName $appPath $remoteSession
+    }
 
     # Set basic service props.
     $startupDir = Get-VstsInput -Name "startupdir"
     $appArgs = Get-VstsInput -Name "appargs"
-    Set-AppProperties $nssmPath $serviceName $appPath $startupDir $appArgs
+    Set-NssmAppProperties $nssmPath $serviceName $appPath $startupDir $appArgs $remoteSession
 
     # Set service details.
     $displayName = Get-VstsInput -Name "displayname"
     $description = Get-VstsInput -Name "description"
-    Set-Details $nssmPath $serviceName $displayName $description
+    Set-NssmDetails $nssmPath $serviceName $displayName $description $remoteSession
 
     # Set LogOn info.
     $serviceAccount = Get-VstsInput -Name "serviceaccount"
     $serviceAccountPass = Get-VstsInput -Name "serviceaccountpass"
-    Set-LogOn $nssmPath $serviceName $serviceAccount $serviceAccountPass
+    Set-NssmLogOn $nssmPath $serviceName $serviceAccount $serviceAccountPass $remoteSession
 
     # Set I/O redirection and file rotation
     $outFile = Get-VstsInput -Name "outfile"
@@ -203,20 +203,20 @@ function Set-NssmService ($remoteExec, $remoteSession, $nssmPath, $serviceName, 
     $rotateRunning = Get-VstsInput -Name "rotaterunning" -AsBool
     $rotatePerSeconds = Get-VstsInput -Name "rotateperseconds" -AsInt
     $rotatePerBytes = Get-VstsInput -Name "rotateperbytes" -AsInt
-    Set-Logs $nssmPath $serviceName $outFile $errFile $rotate $rotateRunning $rotatePerSeconds $rotatePerBytes
+    Set-NssmLogs $nssmPath $serviceName $outFile $errFile $rotate $rotateRunning $rotatePerSeconds $rotatePerBytes $remoteSession
 
     # Apply service desired state.
     switch ($serviceState) {
         "started" {
             if((get-service ExampleService).Status -ne "Running"){
-                Invoke-VstsTool -FileName $nssmPath -Arguments "start $serviceName "
+                Invoke-Tool -FileName $nssmPath -Arguments "start $serviceName" -RemoteSession $remoteSession
             }
         }
         "restarted" {
-            Invoke-VstsTool -FileName $nssmPath -Arguments "restart $serviceName"
+            Invoke-Tool -FileName $nssmPath -Arguments "restart $serviceName" -RemoteSession $remoteSession
         }
         "stopped"{
-            Invoke-VstsTool -FileName $nssmPath -Arguments "stop $serviceName"
+            Invoke-Tool -FileName $nssmPath -Arguments "stop $serviceName" -RemoteSession $remoteSession
         }
         Default {
             # Should not execute this. if happen some validation is missing.
@@ -225,40 +225,46 @@ function Set-NssmService ($remoteExec, $remoteSession, $nssmPath, $serviceName, 
     }
 }
 
-# For more information on the VSTS Task SDK:
-# https://github.com/Microsoft/vsts-task-lib
-Trace-VstsEnteringInvocation $MyInvocation
-try {
+function Main () {
+    # For more information on the VSTS Task SDK:
+    # https://github.com/Microsoft/vsts-task-lib
+    Trace-VstsEnteringInvocation $MyInvocation
+    try {
 
-    # Open pssession if is remote execution.
-    $remoteExec = Get-VstsInput -Name "remote" -AsBool
-    if($remoteExec){
-        Write-Host "Remote execution via WinRM selected."
-        $remoteSession = Get-PSSession
+        # Open pssession if is remote execution.
+        $remoteExec = Get-VstsInput -Name "remote" -AsBool
+        if($remoteExec){
+            Write-Host "Remote execution via WinRM selected."
+            $remoteSession = Get-PSSession
+        }else{
+            # Set local working directory.
+            $cwd = Get-VstsInput -Name "cwd" -Require
+            Assert-VstsPath -LiteralPath $cwd -PathType Container
+            Write-Verbose "Setting working directory to '$cwd'."
+            Set-Location $cwd
+        }
+        
+        # Determine nssm.exe path.
+        $nssmPath = Get-VstsInput -Name "nssmpath"
+        $nssmPath = Resolve-NssmPath $nssmPath $remoteSession
+        Write-Host "nssm path '$nssmPath'"
+        
+        # Get service desired state.
+        $serviceName = Get-VstsInput -Name "servicename"
+        $serviceState = Get-VstsInput -Name "serviceState" -Require
+        
+        # Remove or install/update service.
+        if($serviceState -eq "absent"){
+            Remove-NssmService $nssmPath $serviceName $remoteSession
+        }else{
+            Set-NssmService $nssmPath $serviceName $serviceState $remoteSession
+        }
+        
+    } finally {
+        Trace-VstsLeavingInvocation $MyInvocation
     }
+}
 
-    # Set the working directory.
-    $cwd = Get-VstsInput -Name "cwd" -Require
-    Assert-VstsPath -LiteralPath $cwd -PathType Container
-    Write-Verbose "Setting working directory to '$cwd'."
-    Set-Location $cwd
-
-    # Determine nssm.exe path.
-    $nssmPath = Get-VstsInput -Name "nssmpath"
-    $nssmPath = Resolve-NssmPath $remoteExec $remoteSession $nssmPath
-    Write-Host "nssm path '$nssmPath'"
-
-    # Get service desired state.
-    $serviceName = Get-VstsInput -Name "servicename"
-    $serviceState = Get-VstsInput -Name "serviceState" -Require
-
-    # Remove service or install/update service.
-    if($serviceState -eq "absent"){
-        Remove-NssmService $remoteExec $remoteSession $nssmPath $serviceName
-    }else{
-        Set-NssmService $remoteExec $remoteSession $nssmPath $serviceName $serviceState $cwd
-    }
-
-} finally {
-    Trace-VstsLeavingInvocation $MyInvocation
+if($dotSourceOnly -eq $false){
+    Main
 }
