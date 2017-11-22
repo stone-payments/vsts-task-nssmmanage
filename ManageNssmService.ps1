@@ -7,6 +7,7 @@ function Get-PSSessionOptions($ignoreCertificate){
     }else{
         $sessionOptions = (New-PSSessionOption)
     }
+
     return $sessionOptions
 }
 
@@ -21,6 +22,7 @@ function Get-PSSession () {
     $secpasswd = ConvertTo-SecureString $remoteUserPass -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential ($remoteUser, $secpasswd)
     $remoteSession = New-PSSession -ComputerName $machine -Credential $credential -UseSSL:$useSSL -SessionOption (Get-PSSessionOptions $ignoreCertificate)
+
     return $remoteSession
 }
 
@@ -224,7 +226,6 @@ function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession
         }
     }
 }
-
 function Main () {
     # For more information on the VSTS Task SDK:
     # https://github.com/Microsoft/vsts-task-lib

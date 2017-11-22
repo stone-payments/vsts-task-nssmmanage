@@ -1,3 +1,5 @@
+# TODO: Extract script body routine to some setup behavior inside 'describes' to allow 'Run tests' and 'Debug tests' from vscode.
+
 # Found and import source script.
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
@@ -11,6 +13,7 @@ Import-Module -Name $vstsSdkPath
 Set-Alias -Name Trace-VstsEnteringInvocation -Value Trace-EnteringInvocation
 Set-Alias -Name Trace-VstsLeavingInvocation -Value Trace-LeavingInvocation
 Set-Alias -Name Get-VstsInput -Value Get-Input
+Set-Alias -Name Assert-VstsPath -Value Assert-Path
 Set-Alias -Name Assert-VstsPath -Value Assert-Path
 
 Describe 'Main' {
@@ -136,6 +139,11 @@ Describe 'Get-PSSession' {
         Assert-MockCalled -CommandName Get-VstsInput -Times 1 -Exactly -ParameterFilter { $Name -eq "TestCertificate" -and $Require } -Scope It
     }
     
+    It "Must return some object" {
+        Mock New-PSSession -MockWith { return "not_empty" }
+        Get-PSSession | Should -Not -BeNullOrEmpty
+    }
+
     Context 'PSSession args validation' {
         # Mock expected inputs.
         $expectedComputerName = "UmaMaquinaMinha"
@@ -197,6 +205,189 @@ Describe 'Get-PSSession' {
             Get-PSSession
             # Assert 
             Assert-MockCalled -Command Get-PSSessionOptions -Times 1 -Exactly -ParameterFilter { $ignoreCertificate -eq $false } -Scope It
+        }
+    }
+}
+
+Describe 'Get-PSSessionOptions' {
+    It 'Given ignoreCertificate, session options must ignore certificate checks' {
+        $sessionOptions = Get-PSSessionOptions -ignoreCertificate $true
+        $sessionOptions | Should -Not -BeNullOrEmpty
+        $sessionOptions.SkipCACheck | Should -Be $true
+        $sessionOptions.SkipCNCheck | Should -Be $true
+        $sessionOptions.SkipRevocationCheck | Should -Be $true
+    }
+
+    It 'Given ignoreCertificate as false, session options must do certificate checks' {
+        $sessionOptions = Get-PSSessionOptions -ignoreCertificate $false
+        $sessionOptions | Should -Not -BeNullOrEmpty
+        $sessionOptions.SkipCACheck | Should -Be $false
+        $sessionOptions.SkipCNCheck | Should -Be $false
+        $sessionOptions.SkipRevocationCheck | Should -Be $false
+    }
+}
+
+Describe 'Resolve-NssmPath' {
+
+    Context 'Remote or local execution' {
+        It 'Given not null remote session, must execute remotely' {
+
+            Mock New-PSSession {
+                [pscustomobject]@{
+                    ComputerName      = $ComputerName[0]
+                    Availability      = 'Available'
+                    ComputerType      = 'RemoteMachine'
+                    Id                = 1
+                    Name              = 'Session1'
+                    ConfigurationName = 'Microsoft.PowerShell'
+                    PSTypeName        = 'System.Management.Automation.Runspaces.PSSession'
+                }
+            }
+
+            Mock Get-CimInstance {
+                [pscustomobject]@{
+                    CSName     = 'server'
+                    PSTypeName = 'Microsoft.Management.Infrastructure.CimInstance#root/cimv2/Win32_OperatingSystem'
+                }
+            } -ParameterFilter {$ClassName -And $ClassName -ieq 'Win32_OperatingSystem'}
+
+            Mock Invoke-Command { } -ParameterFilter {
+                $Session -ne $null
+            }
+
+            $guid = [guid]::NewGuid()
+            $fakeSession = (New-PSSession -ComputerName 'server')
+
+            $exThrowed = $false
+            try {
+                Resolve-NssmPath -nssmPath $guid -remoteSession $fakeSession
+            }
+            # Terrible way of verify if invoke-command in remote session is being called. Unfortunately we could not find a way to mock the PSSession type.
+            catch {
+                $exMessage = 'value of type "System.Management.Automation.Runspaces.PSSession" to type "System.Management.Automation.Runspaces.PSSession'
+                $_ | Should -Match $exMessage
+                $exThrowed = $true
+            }
+            finally {
+                $exThrowed | Should -Be $true
+            }
+        }
+
+        It 'Given null remote session, must execute localy' {
+            $expectedPath = "fake_nssm_path"
+            Mock Get-Command { return $expectedPath}
+
+            $emptySession = [System.Management.Automation.Runspaces.PSSession]$null
+            Resolve-NssmPath -nssmPath $expectedPath -remoteSession $emptySession | Should -Be $expectedPath
+        }
+    }
+
+    Context 'scriptblock' {
+        It 'Given valid nssmPath, must return the same value' {
+            $emptySession = [System.Management.Automation.Runspaces.PSSession]$null
+            Resolve-NssmPath -nssmPath "cmd.exe" -remoteSession $emptySession | Should -Be "cmd.exe"
+        }
+
+        It 'Given invalid nssmPath, must try resolve from PATH variable' {
+            $expectedObject = @{ Source = "C:\temp\nssm.exe" }
+            Mock Get-Command { return $null } -ParameterFilter {
+                $Name -eq 'invalidpath'
+            }
+            Mock Get-Command { return $expectedObject } -ParameterFilter {
+                $Name -eq 'nssm.exe'
+            }
+            Mock Write-Host {}
+
+            $emptySession = [System.Management.Automation.Runspaces.PSSession]$null
+            Resolve-NssmPath -nssmPath "invalidpath" -remoteSession $emptySession | Should -Be $expectedObject.Source
+            Assert-MockCalled Write-Host -ParameterFilter {
+                $Object -eq "nssm.exe path invalid or not specified trying to resolve."
+            }
+        }
+    }
+}
+
+Describe 'Remove-NssmService' {
+    It "Must stop and remove service via nssm.exe" {
+        # Arrange
+        Mock Invoke-Tool {}
+        $fakeSession = "fakesession"
+        $expectedPath = "fakenssm.exe"
+        $expectedService = "nssmtestservice"
+        # Act
+        Remove-NssmService $expectedPath $expectedService $fakeSession
+        # Assert
+        $expectedStopCommand = "stop $expectedService"
+        Assert-MockCalled Invoke-Tool -ParameterFilter {
+            ($FileName -eq $expectedPath) -and ($Arguments -eq $expectedStopCommand) -and ($remoteSession -eq $fakeSession)
+        }
+
+        $expectedRemoveCommand = "remove $expectedService confirm"
+        Assert-MockCalled Invoke-Tool -ParameterFilter {
+            ($FileName -eq $expectedPath) -and ($Arguments -eq $expectedRemoveCommand) -and ($remoteSession -eq $fakeSession)
+        }
+    }
+}
+
+Describe 'Invoke-Tool' {
+
+    It "Given not null remote session, must call remote tool" {
+        # Arrange
+        Mock Invoke-RemoteTool {}
+        $expectedPath = "fakenssm.exe"
+        $expectedArgs = "arg1 arg2"
+        $fakeSession = "fakesession"
+        # Act
+        Invoke-Tool -FileName $expectedPath -Arguments $expectedArgs -remoteSession $fakeSession
+        # Assert
+        Assert-MockCalled Invoke-RemoteTool -ParameterFilter {
+            ($FileName -eq $expectedPath) -and ($Arguments -eq $expectedArgs) -and ($remoteSession -eq $fakeSession)
+        } -Exactly -Times 1
+    }
+
+    # Vsts function stub.
+    function Invoke-VstsTool () {}
+    It "Given null remote session, must call vsts tool" {
+        # Arrange
+        Mock Invoke-VstsTool {}
+        $expectedPath = "fakenssm.exe"
+        $expectedArgs = "arg1 arg2"
+        # Act
+        Invoke-Tool -FileName $expectedPath -Arguments $expectedArgs -remoteSession $null
+
+        # Assert
+        Assert-MockCalled Invoke-VstsTool -Exactly -Times 1
+    }
+}
+
+# Override system Invoke-Command with stub.
+function Invoke-Command ($Session, $ArgumentList, $ScriptBlock, $ErrorAction) {}
+Describe 'Invoke-RemoteTool' {
+    Mock Invoke-Command {}
+    $emptySession = [System.Management.Automation.Runspaces.PSSession]$null
+    $fileName = "fakenssm.exe"
+    $fakeArguments = "arg1 arg2"
+    $expectedMessage = "##[command]`"$fileName`" $fakeArguments"
+
+    It 'Must write vsts command snippet' {
+        Mock Write-Host {}
+        # Act
+        Invoke-RemoteTool -FileName $fileName -Arguments $fakeArguments -remoteSession $emptySession
+
+        # Assert
+        Assert-MockCalled Write-Host -Times 1 -Exactly -ParameterFilter {
+            $Object -eq $expectedMessage
+        }
+    }
+
+    It 'Must invoke remote command' {
+        $fakeSession = "fakePssession"
+        # Act
+        Invoke-RemoteTool -FileName $fileName -Arguments $fakeArguments -remoteSession $fakeSession
+
+        # Assert
+        Assert-MockCalled Invoke-Command -Scope It -ParameterFilter {
+            ($Session -eq $fakeSession)
         }
     }
 }
