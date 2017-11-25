@@ -210,7 +210,7 @@ function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession
     # Apply service desired state.
     switch ($serviceState) {
         "started" {
-            if((get-service ExampleService).Status -ne "Running"){
+            if((get-service $serviceName).Status -ne "Running"){
                 Invoke-Tool -FileName $nssmPath -Arguments "start $serviceName" -RemoteSession $remoteSession
             }
         }
