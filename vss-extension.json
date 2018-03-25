@@ -1,8 +1,8 @@
 {
     "manifestVersion": 1,
     "id": "nssm-manage",
-    "name": "Manage NSSM Service",
-    "version": "1.1.2",
+    "name": "Lab Extension",
+    "version": "1.1.3",
     "publisher": "cnatan",
     "targets": [
         {
@@ -14,28 +14,15 @@
         "Build and release"
     ],
     "icons": {
-        "default": "images/icon.png"
+        "default": "images/testicon.png"
     },
     "files": [
-        {
-            "path": "buildtask"
-        },
         {
             "path": "images\\testicon.png",
             "addressable": true 
         }
     ],
     "contributions": [
-        {
-            "id": "custom-build-task",
-            "type": "ms.vss-distributed-task.task",
-            "targets": [
-                "ms.vss-distributed-task.tasks"
-            ],
-            "properties": {
-                "name": "buildtask"
-            }
-        },
         {
             "id": "sample-template",
             "type": "ms.vss-environmenttemplate.environment-template",
