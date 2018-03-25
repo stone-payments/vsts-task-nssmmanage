@@ -172,6 +172,10 @@ function Get-NssmService($serviceName, $remoteSession){
     }
 }
 
+function Set-NssmExitActions ($nssmPath, $serviceName, $recoverAction, $remoteSession) {
+    Invoke-Tool -FileName $nssmPath -Arguments "set $serviceName AppExit Default $recoverAction" -RemoteSession $remoteSession
+}
+
 function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession) {
 
     # Install service if not found.
@@ -207,10 +211,13 @@ function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession
     $rotatePerBytes = Get-VstsInput -Name "rotateperbytes" -AsInt
     Set-NssmLogs $nssmPath $serviceName $outFile $errFile $rotate $rotateRunning $rotatePerSeconds $rotatePerBytes $remoteSession
 
+    $recoverAction = Get-VstsInput -Name "recovertaction"
+    Set-NssmExitActions $nssmPath $serviceName $recoverAction $remoteSession
+
     # Apply service desired state.
     switch ($serviceState) {
         "started" {
-            if((get-service ExampleService).Status -ne "Running"){
+            if((get-service $serviceName -ErrorAction Ignore).Status -ne "Running"){
                 Invoke-Tool -FileName $nssmPath -Arguments "start $serviceName" -RemoteSession $remoteSession
             }
         }

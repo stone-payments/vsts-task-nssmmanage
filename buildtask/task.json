@@ -12,9 +12,9 @@
   ],
   "demands": [],
   "version": {
-    "Major": "3",
-    "Minor": "2",
-    "Patch": "0"
+    "Major": "4",
+    "Minor": "0",
+    "Patch": "34"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "NssmManage $(message)",
@@ -42,6 +42,11 @@
     {
       "name" : "fileRotation",
       "displayName": "FileRotation",
+      "isExpanded": false
+    },
+    {
+      "name" : "exitActions",
+      "displayName": "Exit actions",
       "isExpanded": false
     },
     {
@@ -279,6 +284,25 @@
       "required": false,
       "groupName": "installationAndExecution",
       "helpMarkDown": "Nssm executable path if not in PATH variable."
+    },
+    { 
+      "name": "recovertaction",
+      "type": "pickList",
+      "label": "Recover Action",
+      "helpMarkDown": "Action to take when applications exits other than in response to a controlled service shutdown",
+      "defaultValue": "Restart",
+      "required": true,
+      "groupName": "exitActions",
+      "options": {
+        "Restart": "Restart application",
+        "Ignore": "No action (srvany compatible)",
+        "Exit": "Stop service (oneshot mode)",
+        "Suicide": "Fake crash (pre-Vista)"
+      },
+      "properties": {
+        "EditableOptions": "false",
+        "PopulateDefaultValue": "true"
+      }
     }
   ],
   "execution": {
