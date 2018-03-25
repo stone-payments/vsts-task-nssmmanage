@@ -2,19 +2,19 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Manage NSSM Service",
-    "version": "1.1.0",
+    "version": "1.1.1",
     "publisher": "cnatan",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
-    ],    
+    ],
     "description": "Install and edit windows services through nssm.",
     "categories": [
         "Build and release"
     ],
     "icons": {
-        "default": "images/icon.png"        
+        "default": "images/icon.png"
     },
     "files": [
         {
@@ -30,6 +30,107 @@
             ],
             "properties": {
                 "name": "buildtask"
+            }
+        },
+        {
+            "id": "sample-template",
+            "type": "ms.vss-environmenttemplate.environment-template",
+            "targets": [
+                "ms.vss-environmenttemplate.environment-templates"
+            ],
+            "properties": {
+                "id": "682dd05d-0163-4ba9-8a81-91a13906435f",
+                "name": "cnatan enviroment template test",
+                "description": "Environment template test.",
+                "variables": {
+                    "AdministratorLogin": {
+                        "value": null
+                    },
+                    "AdministratorLoginPassword": {
+                        "value": "",
+                        "isSecret": true
+                    },
+                    "DatabaseName": {
+                        "value": null
+                    },
+                    "ServerName": {
+                        "value": null
+                    },
+                    "ConnectionStringName": {
+                        "value": null
+                    },
+                    "ReleasePlatform": {
+                        "value": "Any CPU"
+                    },
+                    "ReleaseConfiguration": {
+                        "value": "Release"
+                    }
+                },
+                "deployPhases": [
+                    {
+                        "deploymentInput": {
+                            "parallelExecution": {
+                                "parallelExecutionType": "none"
+                            },
+                            "skipArtifactsDownload": false,
+                            "artifactsDownloadInput": {
+                                "downloadInputs": []
+                            },
+                            "queueId": 4,
+                            "demands": [],
+                            "enableAccessToken": false,
+                            "timeoutInMinutes": 0,
+                            "jobCancelTimeoutInMinutes": 1,
+                            "condition": "succeeded()",
+                            "overrideInputs": {}
+                        },
+                        "rank": 1,
+                        "phaseType": 1,
+                        "name": "Agent phase",
+                        "workflowTasks": [
+                            {
+                                "taskId": "34cfa730-cb47-11e7-aeb5-fd386a6d4946",
+                                "version": "4.*",
+                                "name": "NssmManage ",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "cwd": "",
+                                    "serviceState": "stopped",
+                                    "servicename": "teste",
+                                    "apppath": "",
+                                    "startupdir": "",
+                                    "appargs": "",
+                                    "displayname": "",
+                                    "description": "",
+                                    "serviceaccount": "",
+                                    "serviceaccountpass": "",
+                                    "outfile": "",
+                                    "errfile": "",
+                                    "rotate": "false",
+                                    "rotaterunning": "false",
+                                    "rotateperseconds": "0",
+                                    "rotateperbytes": "0",
+                                    "remote": "false",
+                                    "Machine": "",
+                                    "AdminUserName": "",
+                                    "AdminPassword": "",
+                                    "Protocol": "",
+                                    "TestCertificate": "true",
+                                    "nssmpath": "",
+                                    "recovertaction": "Restart"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "icon": "images/testicon.png"
             }
         }
     ]
