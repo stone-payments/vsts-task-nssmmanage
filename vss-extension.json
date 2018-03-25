@@ -9,7 +9,7 @@
             "id": "Microsoft.VisualStudio.Services"
         }
     ],
-    "description": "Install and edit windows services through nssm.",
+    "description": "Lab extension to test tasks and environment templates.",
     "categories": [
         "Build and release"
     ],
