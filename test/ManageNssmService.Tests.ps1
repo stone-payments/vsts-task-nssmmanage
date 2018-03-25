@@ -4,9 +4,9 @@
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $sut = (Split-Path -Leaf $MyInvocation.MyCommand.Path) -replace '\.Tests\.', '.'
 $srcDir = "$here\.."
-. "$srcDir\$sut" -dotSourceOnly
+. "$srcDir\scripts\$sut" -dotSourceOnly
 # Import vsts sdk.
-$vstsSdkPath = Join-Path $PSScriptRoot ..\ps_modules\VstsTaskSdk\VstsTaskSdk.psm1 -Resolve
+$vstsSdkPath = Join-Path $PSScriptRoot ..\sdk\ps_modules\VstsTaskSdk\VstsTaskSdk.psm1 -Resolve
 Import-Module -Name $vstsSdkPath
 
 # Set vsts sdk aliases.
