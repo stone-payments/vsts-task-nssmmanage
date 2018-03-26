@@ -119,10 +119,209 @@
                                 }
                             }
                         ]
-                    }
+                    },
                 ],
                 "icon": "images/testicon.png"
             }
+        },
+        {
+            "id": "windows-service-with-big-ip-template",
+            "type": "ms.vss-environmenttemplate.environment-template",
+            "targets": [
+                "ms.vss-environmenttemplate.environment-templates"
+            ],
+            "properties": {
+                "id": "123dd05d-0163-4ba9-8a81-91a13906435f",
+                "name": "Windows Service with BigIP",
+                "description": "Deploys a Windows Service using the integration with the BigIP Load Balancer.",
+                "variables": {
+                    "F5PartitionName": {
+                        "value": null
+                    },
+                    "F5PoolName": {
+                        "value": null
+                    },
+                    "DatabaseName": {
+                        "value": null
+                    },
+                    "StoneCo.ServiceName": {
+                        "value": null
+                    }
+                },
+                "deployPhases": [
+                    {
+                        "deploymentInput": {
+                            "healthPercent": 0,
+                            "deploymentHealthOption": "Custom",
+                            "tags": [],
+                            "skipArtifactsDownload": false,
+                            "artifactsDownloadInput": {
+                                "downloadInputs": []
+                            },
+                            "queueId": 500,
+                            "demands": [],
+                            "enableAccessToken": false,
+                            "timeoutInMinutes": 0,
+                            "jobCancelTimeoutInMinutes": 1,
+                            "condition": "succeeded()",
+                            "overrideInputs": {}
+                        },
+                        "rank": 1,
+                        "phaseType": 4,
+                        "name": "Deployment group phase",
+                        "workflowTasks": [
+                            {
+                                "taskId": "31e75ea1-9d22-11e3-acb4-7dd161269b25",
+                                "version": "0.*",
+                                "name": "Disable Pool Member: /$(F5PoolName)/$(F5PartitionName)/$(Agent.MachineName))",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "LTMName": "$(F5LTMName)",
+                                    "UserName": "$(F5UserName)",
+                                    "Password": "$(F5Password)",
+                                    "Partition": "$(F5PartitionName)",
+                                    "PoolName": "$(F5PoolName)",
+                                    "Name": "$(Agent.MachineName)",
+                                    "DisableMethod": "ForcedOffline"
+                                }
+                            },
+                            {
+                                "taskId": "2f321c10-7d4d-46d0-b3a1-f78cc01b8a7c",
+                                "version": "0.*",
+                                "name": "Stop Service $(StoneCo.ServiceName)",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "ServiceName": "$(StoneCo.ServiceName)",
+                                    "Timeout": "60",
+                                    "SkipWhenServiceDoesNotExists": "false",
+                                    "KillService": "true"
+                                }
+                            },
+                            {
+                                "taskId": "a8515ec8-7254-4ffd-912c-86772e2b5962",
+                                "version": "2.*",
+                                "name": "Replace tokens in *.config",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "rootDirectory": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release/",
+                                    "targetFiles": "*.config",
+                                    "encoding": "auto",
+                                    "writeBOM": "true",
+                                    "actionOnMissing": "warn",
+                                    "keepToken": "false",
+                                    "tokenPrefix": "#{",
+                                    "tokenSuffix": "}#",
+                                    "emptyValue": "(empty)",
+                                    "escapeChar": "",
+                                    "charsToEscape": ""
+                                }
+                            },
+                            {
+                                "taskId": "5bfb729a-a7c8-4a78-a7c3-8d717bb7c13c",
+                                "version": "2.*",
+                                "name": "Copy Files to: $(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "SourceFolder": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release",
+                                    "Contents": "**",
+                                    "TargetFolder": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\",
+                                    "CleanTargetFolder": "false",
+                                    "OverWrite": "false",
+                                    "flattenFolders": "false"
+                                }
+                            },
+                            {
+                                "taskId": "2f32dc10-7d4d-46d0-b3a1-f78cc01b8a7c",
+                                "version": "0.*",
+                                "name": "Install Service $(StoneCo.ServiceName)",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "ServiceName": "$(StoneCo.ServiceName)",
+                                    "ServiceBinaryPath": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\WhoAmIWinService.exe",
+                                    "InstallationMode": "CustomCommand",
+                                    "InstallArguments": "--install",
+                                    "ServiceUser": "Default",
+                                    "ServiceAccount": "",
+                                    "ServicePassword": ""
+                                }
+                            },
+                            {
+                                "taskId": "2f321c10-7d4d-46d0-b3a1-f78cc01b8a7d",
+                                "version": "0.*",
+                                "name": "Start Service $(StoneCo.ServiceName)",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "ServiceName": "$(StoneCo.ServiceName)"
+                                }
+                            },
+                            {
+                                "taskId": "31e75ea1-9d22-11e3-acb4-7dde61269b25",
+                                "version": "0.*",
+                                "name": "Enable Pool Member: /$(F5PoolName)/$(F5PartitionName)/$(Agent.MachineName))",
+                                "refName": "",
+                                "enabled": true,
+                                "alwaysRun": false,
+                                "continueOnError": false,
+                                "timeoutInMinutes": 0,
+                                "definitionType": "task",
+                                "overrideInputs": {},
+                                "condition": "succeeded()",
+                                "inputs": {
+                                    "LTMName": "$(F5LTMName)",
+                                    "UserName": "$(F5UserName)",
+                                    "Password": "$(F5Password)",
+                                    "Partition": "$(F5PartitionName)",
+                                    "PoolName": "$(F5PoolName)",
+                                    "Name": "$(Agent.MachineName)"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                "icon": "images/template-windows-service-with-big-ip.png"
+            } 
         }
     ]
 }
