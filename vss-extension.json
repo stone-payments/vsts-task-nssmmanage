@@ -235,6 +235,9 @@
                 "variables": {
                     "StoneCo.ServiceName": {
                         "value": null
+                    },
+                    "StoneCo.DefaultInstalationDir": {
+                        "value": null
                     }
                 },
                 "deployPhases": [
@@ -307,7 +310,7 @@
                             {
                                 "taskId": "5bfb729a-a7c8-4a78-a7c3-8d717bb7c13c",
                                 "version": "2.*",
-                                "name": "Copy Files to: $(DEFAULT_INSTALATION_DIR)\\Buy4.WhoAmIWinService",
+                                "name": "Copy Files to: $(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService",
                                 "refName": "",
                                 "enabled": true,
                                 "alwaysRun": false,
@@ -319,7 +322,7 @@
                                 "inputs": {
                                     "SourceFolder": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release",
                                     "Contents": "**",
-                                    "TargetFolder": "$(DEFAULT_INSTALATION_DIR)\\Buy4.WhoAmIWinService",
+                                    "TargetFolder": "$(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService",
                                     "CleanTargetFolder": "false",
                                     "OverWrite": "false",
                                     "flattenFolders": "false"
@@ -339,7 +342,7 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "ServiceName": "WhoAmIWinService",
-                                    "ServiceBinaryPath": "$(DEFAULT_INSTALATION_DIR)\\Buy4.WhoAmIWinService\\WhoAmIWinService.exe",
+                                    "ServiceBinaryPath": "$(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService\\WhoAmIWinService.exe",
                                     "InstallationMode": "CustomCommand",
                                     "InstallArguments": "--install",
                                     "ServiceUser": "Default",
