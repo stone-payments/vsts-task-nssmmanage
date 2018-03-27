@@ -233,15 +233,6 @@
                 "name": "Windows Service Template",
                 "description": "Deploys a Windows Service.",
                 "variables": {
-                    "F5PartitionName": {
-                        "value": null
-                    },
-                    "F5PoolName": {
-                        "value": null
-                    },
-                    "DatabaseName": {
-                        "value": null
-                    },
                     "StoneCo.ServiceName": {
                         "value": null
                     }
