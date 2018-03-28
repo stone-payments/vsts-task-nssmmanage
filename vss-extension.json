@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.4",
+    "version": "1.1.5",
     "publisher": "cnatan",
     "targets": [
         {
@@ -18,7 +18,7 @@
     },
     "files": [
         {
-            "path": "images\\testicon.png",
+            "path": "images",
             "addressable": true 
         }
     ],
@@ -32,7 +32,7 @@
             "properties": {
                 "id": "123dd05d-0163-4ba9-8a81-91a13906435f",
                 "name": "Windows Service with BigIP",
-                "description": "Deploys a Windows Service using the integration with the BigIP Load Balancer.",
+                "description": "Deployment Group: Deploys a Windows Service using the integration with the BigIP Load Balancer.",
                 "variables": {
                     "F5PartitionName": {
                         "value": null
@@ -231,7 +231,7 @@
             "properties": {
                 "id": "124dd05d-0163-4ba9-8a81-91a13906435f",
                 "name": "Windows Service Template",
-                "description": "Deploys a Windows Service.",
+                "description": "Deployment Group: Deploys a Windows Service.",
                 "variables": {
                     "StoneCo.ServiceName": {
                         "value": null
@@ -381,7 +381,7 @@
             "properties": {
                 "id": "125dd05d-0163-4ba9-8a81-91a13906435f",
                 "name": "IIS Website Template",
-                "description": "Deploys a IIS Website.",
+                "description": "Deployment Group: Deploys a IIS Website.",
                 "variables": {
                     "StoneCo.MySettingValue": {
                         "value": null
@@ -700,8 +700,8 @@
             ],
             "properties": {
                 "id": "126dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "IIS Website Template",
-                "description": "Deploys a IIS Website.",
+                "name": "IIS Website with BigIp",
+                "description": "Deployment Group: Deploys a IIS Website with BigIp.",
                 "variables": {
                     "F5PartitionName": {
                         "value": null
