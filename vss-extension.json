@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.5",
+    "version": "1.1.6",
     "publisher": "cnatan",
     "targets": [
         {
@@ -230,7 +230,7 @@
             ],
             "properties": {
                 "id": "124dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "Windows Service Template",
+                "name": "Windows Service",
                 "description": "Deployment Group: Deploys a Windows Service.",
                 "variables": {
                     "StoneCo.ServiceName": {
@@ -383,9 +383,6 @@
                 "name": "IIS Website",
                 "description": "Deployment Group: Deploys a IIS Website.",
                 "variables": {
-                    "StoneCo.MySettingValue": {
-                        "value": null
-                    },
                     "StoneCo.SiteDirectory": {
                         "value": null
                     },
@@ -459,13 +456,13 @@
                                     "AnonymousAuthenticationForWebsite": "false",
                                     "BasicAuthenticationForWebsite": "false",
                                     "WindowsAuthenticationForWebsite": "true",
-                                    "ParentWebsiteNameForVD": "$(Parameters.WebsiteName)",
+                                    "ParentWebsiteNameForVD": "$StoneCo.SiteName",
                                     "VirtualPathForVD": "$(Parameters.VirtualPathForApplication)",
                                     "PhysicalPathForVD": "%SystemDrive%\\inetpub\\wwwroot",
                                     "VDPhysicalPathAuth": "VDUserPassThrough",
                                     "VDAuthUserName": "",
                                     "VDAuthUserPassword": "",
-                                    "ParentWebsiteNameForApplication": "$(Parameters.WebsiteName)",
+                                    "ParentWebsiteNameForApplication": "$(StoneCo.SiteName)",
                                     "VirtualPathForApplication": "$(Parameters.VirtualPathForApplication)",
                                     "PhysicalPathForApplication": "%SystemDrive%\\inetpub\\wwwroot",
                                     "ApplicationPhysicalPathAuth": "ApplicationUserPassThrough",
@@ -574,7 +571,7 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "WebSiteName": "$(Parameters.WebsiteName)",
+                                    "WebSiteName": "$(StoneCo.SiteName)",
                                     "VirtualApplication": "",
                                     "Package": "$(System.DefaultWorkingDirectory)/HelloWorld-WebApplication-Build/drop/WhoAmIWebApplication.zip",
                                     "SetParametersFile": "",
@@ -783,8 +780,8 @@
                                     "IISDeploymentType": "$(Parameters.IISDeploymentType)",
                                     "ActionIISWebsite": "$(Parameters.ActionIISWebsite)",
                                     "ActionIISApplicationPool": "CreateOrUpdateAppPool",
-                                    "StartStopWebsiteName": "$(Parameters.WebsiteName)",
-                                    "WebsiteName": "$(Parameters.WebsiteName)",
+                                    "StartStopWebsiteName": "$(StoneCo.SiteName)",
+                                    "WebsiteName": "$(StoneCo.SiteName)",
                                     "WebsitePhysicalPath": "$(StoneCo.SiteDirectory)",
                                     "WebsitePhysicalPathAuth": "WebsiteUserPassThrough",
                                     "WebsiteAuthUserName": "",
@@ -810,13 +807,13 @@
                                     "AnonymousAuthenticationForWebsite": "false",
                                     "BasicAuthenticationForWebsite": "false",
                                     "WindowsAuthenticationForWebsite": "true",
-                                    "ParentWebsiteNameForVD": "$(Parameters.WebsiteName)",
+                                    "ParentWebsiteNameForVD": "$(StoneCo.SiteName)",
                                     "VirtualPathForVD": "$(Parameters.VirtualPathForApplication)",
                                     "PhysicalPathForVD": "%SystemDrive%\\inetpub\\wwwroot",
                                     "VDPhysicalPathAuth": "VDUserPassThrough",
                                     "VDAuthUserName": "",
                                     "VDAuthUserPassword": "",
-                                    "ParentWebsiteNameForApplication": "$(Parameters.WebsiteName)",
+                                    "ParentWebsiteNameForApplication": "$(StoneCo.SiteName)",
                                     "VirtualPathForApplication": "$(Parameters.VirtualPathForApplication)",
                                     "PhysicalPathForApplication": "%SystemDrive%\\inetpub\\wwwroot",
                                     "ApplicationPhysicalPathAuth": "ApplicationUserPassThrough",
@@ -1061,6 +1058,85 @@
                         ]
                     }
                 ],
+                "processParameters": {
+                    "inputs": [
+                        {
+                            "aliases": [],
+                            "options": {
+                                "IISWebsite": "IIS Website",
+                                "IISWebApplication": "IIS Web Application",
+                                "IISVirtualDirectory": "IIS Virtual Directory",
+                                "IISApplicationPool": "IIS Application Pool"
+                            },
+                            "properties": {},
+                            "name": "IISDeploymentType",
+                            "label": "Configuration type",
+                            "defaultValue": "IISWebsite",
+                            "required": true,
+                            "type": "pickList",
+                            "helpMarkDown": "You can create or update sites, applications, virtual directories, and application pools.",
+                            "groupName": ""
+                        },
+                        {
+                            "aliases": [],
+                            "options": {
+                                "CreateOrUpdateWebsite": "Create Or Update",
+                                "StartWebsite": "Start",
+                                "StopWebsite": "Stop"
+                            },
+                            "properties": {},
+                            "name": "ActionIISWebsite",
+                            "label": "Action",
+                            "defaultValue": "CreateOrUpdateWebsite",
+                            "required": true,
+                            "type": "pickList",
+                            "helpMarkDown": "Select the appropriate action that you want to perform on an IIS website.<br /><br />\\\"Create Or Update\\\" will create a website or update an existing website.<br /><br /> Start, Stop will start or stop the website respectively.",
+                            "visibleRule": "IISDeploymentType = IISWebsite",
+                            "groupName": ""
+                        },
+                        {
+                            "aliases": [],
+                            "options": {},
+                            "properties": {},
+                            "name": "WebsiteName",
+                            "label": "Website name",
+                            "defaultValue": "$(StoneCo.SiteName)",
+                            "required": true,
+                            "type": "string",
+                            "helpMarkDown": "Provide the name of the IIS website to create or update.",
+                            "groupName": ""
+                        },
+                        {
+                            "aliases": [],
+                            "options": {},
+                            "properties": {},
+                            "name": "AddBinding",
+                            "label": "Add binding",
+                            "defaultValue": "True",
+                            "type": "boolean",
+                            "helpMarkDown": "Select the option to add port binding for the website.",
+                            "visibleRule": "IISDeploymentType = IISWebsite && ActionIISWebsite = CreateOrUpdateWebsite",
+                            "groupName": ""
+                        },
+                        {
+                            "aliases": [],
+                            "options": {},
+                            "properties": {
+                                "resizable": "true",
+                                "editorExtension": "ms.vss-services-azure.iis-multiple-binding",
+                                "displayFormat": "{{#bindings}}{{protocol}}/{{ipAddress}}:{{port}}:{{hostname}}\n{{/bindings}}"
+                            },
+                            "name": "Bindings",
+                            "label": "Add bindings",
+                            "defaultValue": "{\"bindings\":[{\"protocol\":\"http\",\"ipAddress\":\"All Unassigned\",\"port\":\"89\",\"hostname\":\"\",\"sslThumbprint\":\"\",\"sniFlag\":false}]}",
+                            "required": true,
+                            "type": "multiLine",
+                            "helpMarkDown": "Click on the extension [...] button to add bindings for the website.",
+                            "visibleRule": "IISDeploymentType = IISWebsite && ActionIISWebsite = CreateOrUpdateWebsite && AddBinding = true",
+                            "groupName": ""
+                        }
+                    ]
+                },
                 "icon": "images/template-iis-with-big-ip.png"
             } 
         }
