@@ -380,7 +380,7 @@
             ],
             "properties": {
                 "id": "125dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "IIS Website Template",
+                "name": "IIS Website",
                 "description": "Deployment Group: Deploys a IIS Website.",
                 "variables": {
                     "StoneCo.MySettingValue": {
