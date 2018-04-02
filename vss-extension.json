@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.9",
+    "version": "1.1.10",
     "publisher": "cnatan",
     "targets": [
         {
@@ -427,7 +427,7 @@
                                 "inputs": {
                                     "EnableIIS": "false",
                                     "IISDeploymentType": "IISWebsite",
-                                    "ActionIISWebsite": "Create Or Update",
+                                    "ActionIISWebsite": "CreateOrUpdateWebsite",
                                     "StartStopWebsiteName": "$(StoneCo.SiteName)",
                                     "WebsiteName": "$(StoneCo.SiteName)",
                                     "WebsitePhysicalPath": "$(StoneCo.SiteDirectory)",
@@ -610,7 +610,7 @@
                                 "inputs": {
                                     "EnableIIS": "false",
                                     "IISDeploymentType": "IISWebsite",
-                                    "ActionIISWebsite": "Create Or Update",
+                                    "ActionIISWebsite": "CreateOrUpdateWebsite",
                                     "StartStopWebsiteName": "$(StoneCo.SiteName)",
                                     "WebsiteName": "$(StoneCo.SiteName)",
                                     "WebsitePhysicalPath": "$(StoneCo.SiteDirectory)",
