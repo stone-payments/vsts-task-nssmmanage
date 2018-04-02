@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.8",
+    "version": "1.1.9",
     "publisher": "cnatan",
     "targets": [
         {
@@ -384,10 +384,10 @@
                 "description": "Deployment Group: Deploys a IIS Website.",
                 "variables": {
                     "StoneCo.SiteDirectory": {
-                        "value": null
+                        "value": "C:\\inetpub\\PREENCHER_ISSO_AQUI"
                     },
                     "StoneCo.SiteName": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     }
                 },
                 "deployPhases": [
@@ -411,7 +411,7 @@
                         "rank": 1,
                         "phaseType": 4,
                         "name": "IIS Deployment",
-                        "workflowTasks": [
+                        "workflowTasks": [                            
                             {
                                 "taskId": "1b2aec60-dc49-11e6-9b76-63056e018cac",
                                 "version": "0.*",
@@ -426,63 +426,12 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "EnableIIS": "false",
-                                    "IISDeploymentType": "$(Parameters.IISDeploymentType)",
-                                    "ActionIISWebsite": "$(Parameters.ActionIISWebsite)",
-                                    "ActionIISApplicationPool": "CreateOrUpdateAppPool",
-                                    "StartStopWebsiteName": "$(Parameters.WebsiteName)",
-                                    "WebsiteName": "$(Parameters.WebsiteName)",
+                                    "IISDeploymentType": "IISWebsite",
+                                    "ActionIISWebsite": "Create Or Update",
+                                    "StartStopWebsiteName": "$(StoneCo.SiteName)",
+                                    "WebsiteName": "$(StoneCo.SiteName)",
                                     "WebsitePhysicalPath": "$(StoneCo.SiteDirectory)",
-                                    "WebsitePhysicalPathAuth": "WebsiteUserPassThrough",
-                                    "WebsiteAuthUserName": "",
-                                    "WebsiteAuthUserPassword": "",
-                                    "AddBinding": "$(Parameters.AddBinding)",
-                                    "Protocol": "http",
-                                    "IPAddress": "All Unassigned",
-                                    "Port": "80",
-                                    "ServerNameIndication": "false",
-                                    "HostNameWithOutSNI": "",
-                                    "HostNameWithHttp": "",
-                                    "HostNameWithSNI": "",
-                                    "SSLCertThumbPrint": "",
-                                    "Bindings": "$(Parameters.Bindings)",
-                                    "CreateOrUpdateAppPoolForWebsite": "false",
-                                    "ConfigureAuthenticationForWebsite": "false",
-                                    "AppPoolNameForWebsite": "",
-                                    "DotNetVersionForWebsite": "v4.0",
-                                    "PipeLineModeForWebsite": "Integrated",
-                                    "AppPoolIdentityForWebsite": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForWebsite": "",
-                                    "AppPoolPasswordForWebsite": "",
-                                    "AnonymousAuthenticationForWebsite": "false",
-                                    "BasicAuthenticationForWebsite": "false",
-                                    "WindowsAuthenticationForWebsite": "true",
-                                    "ParentWebsiteNameForVD": "$StoneCo.SiteName",
-                                    "VirtualPathForVD": "$(Parameters.VirtualPathForApplication)",
-                                    "PhysicalPathForVD": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "VDPhysicalPathAuth": "VDUserPassThrough",
-                                    "VDAuthUserName": "",
-                                    "VDAuthUserPassword": "",
-                                    "ParentWebsiteNameForApplication": "$(StoneCo.SiteName)",
-                                    "VirtualPathForApplication": "$(Parameters.VirtualPathForApplication)",
-                                    "PhysicalPathForApplication": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "ApplicationPhysicalPathAuth": "ApplicationUserPassThrough",
-                                    "ApplicationAuthUserName": "",
-                                    "ApplicationAuthUserPassword": "",
-                                    "CreateOrUpdateAppPoolForApplication": "false",
-                                    "AppPoolNameForApplication": "",
-                                    "DotNetVersionForApplication": "v4.0",
-                                    "PipeLineModeForApplication": "Integrated",
-                                    "AppPoolIdentityForApplication": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForApplication": "",
-                                    "AppPoolPasswordForApplication": "",
-                                    "AppPoolName": "$(Parameters.AppPoolName)",
-                                    "DotNetVersion": "v4.0",
-                                    "PipeLineMode": "Integrated",
-                                    "AppPoolIdentity": "ApplicationPoolIdentity",
-                                    "AppPoolUsername": "",
-                                    "AppPoolPassword": "",
-                                    "StartStopRecycleAppPoolName": "",
-                                    "AppCmdCommands": ""
+                                    "AddBinding": "true"                           
                                 }
                             },
                             {
@@ -501,61 +450,8 @@
                                     "EnableIIS": "false",
                                     "IISDeploymentType": "IISWebsite",
                                     "ActionIISWebsite": "StopWebsite",
-                                    "ActionIISApplicationPool": "CreateOrUpdateAppPool",
                                     "StartStopWebsiteName": "$(StoneCo.SiteName)",
-                                    "WebsiteName": "",
-                                    "WebsitePhysicalPath": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "WebsitePhysicalPathAuth": "WebsiteUserPassThrough",
-                                    "WebsiteAuthUserName": "",
-                                    "WebsiteAuthUserPassword": "",
-                                    "AddBinding": "false",
-                                    "Protocol": "http",
-                                    "IPAddress": "All Unassigned",
-                                    "Port": "80",
-                                    "ServerNameIndication": "false",
-                                    "HostNameWithOutSNI": "",
-                                    "HostNameWithHttp": "",
-                                    "HostNameWithSNI": "",
-                                    "SSLCertThumbPrint": "",
-                                    "Bindings": "",
-                                    "CreateOrUpdateAppPoolForWebsite": "false",
-                                    "ConfigureAuthenticationForWebsite": "false",
-                                    "AppPoolNameForWebsite": "",
-                                    "DotNetVersionForWebsite": "v4.0",
-                                    "PipeLineModeForWebsite": "Integrated",
-                                    "AppPoolIdentityForWebsite": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForWebsite": "",
-                                    "AppPoolPasswordForWebsite": "",
-                                    "AnonymousAuthenticationForWebsite": "false",
-                                    "BasicAuthenticationForWebsite": "false",
-                                    "WindowsAuthenticationForWebsite": "true",
-                                    "ParentWebsiteNameForVD": "",
-                                    "VirtualPathForVD": "",
-                                    "PhysicalPathForVD": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "VDPhysicalPathAuth": "VDUserPassThrough",
-                                    "VDAuthUserName": "",
-                                    "VDAuthUserPassword": "",
-                                    "ParentWebsiteNameForApplication": "",
-                                    "VirtualPathForApplication": "",
-                                    "PhysicalPathForApplication": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "ApplicationPhysicalPathAuth": "ApplicationUserPassThrough",
-                                    "ApplicationAuthUserName": "",
-                                    "ApplicationAuthUserPassword": "",
-                                    "CreateOrUpdateAppPoolForApplication": "false",
-                                    "AppPoolNameForApplication": "",
-                                    "DotNetVersionForApplication": "v4.0",
-                                    "PipeLineModeForApplication": "Integrated",
-                                    "AppPoolIdentityForApplication": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForApplication": "",
-                                    "AppPoolPasswordForApplication": "",
-                                    "AppPoolName": "",
-                                    "DotNetVersion": "v4.0",
-                                    "PipeLineMode": "Integrated",
-                                    "AppPoolIdentity": "ApplicationPoolIdentity",
-                                    "AppPoolUsername": "",
-                                    "AppPoolPassword": "",
-                                    "StartStopRecycleAppPoolName": "",
-                                    "AppCmdCommands": ""
+                                    "WebsiteName": "$(StoneCo.SiteName)"                                    
                                 }
                             },
                             {
@@ -572,16 +468,8 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "WebSiteName": "$(StoneCo.SiteName)",
-                                    "VirtualApplication": "",
-                                    "Package": "$(System.DefaultWorkingDirectory)/HelloWorld-WebApplication-Build/drop/WhoAmIWebApplication.zip",
-                                    "SetParametersFile": "",
-                                    "RemoveAdditionalFilesFlag": "false",
-                                    "ExcludeFilesFromAppDataFlag": "false",
-                                    "TakeAppOfflineFlag": "True",
-                                    "AdditionalArguments": "",
-                                    "XmlTransformation": "false",
-                                    "XmlVariableSubstitution": "false",
-                                    "JSONFiles": ""
+                                    "Package": "$(System.DefaultWorkingDirectory)\\**\\*.zip",
+                                    "TakeAppOfflineFlag": "True"
                                 }
                             },
                             {
@@ -626,61 +514,8 @@
                                     "EnableIIS": "false",
                                     "IISDeploymentType": "IISWebsite",
                                     "ActionIISWebsite": "StartWebsite",
-                                    "ActionIISApplicationPool": "CreateOrUpdateAppPool",
                                     "StartStopWebsiteName": "$(StoneCo.SiteName)",
-                                    "WebsiteName": "",
-                                    "WebsitePhysicalPath": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "WebsitePhysicalPathAuth": "WebsiteUserPassThrough",
-                                    "WebsiteAuthUserName": "",
-                                    "WebsiteAuthUserPassword": "",
-                                    "AddBinding": "false",
-                                    "Protocol": "http",
-                                    "IPAddress": "All Unassigned",
-                                    "Port": "80",
-                                    "ServerNameIndication": "false",
-                                    "HostNameWithOutSNI": "",
-                                    "HostNameWithHttp": "",
-                                    "HostNameWithSNI": "",
-                                    "SSLCertThumbPrint": "",
-                                    "Bindings": "",
-                                    "CreateOrUpdateAppPoolForWebsite": "false",
-                                    "ConfigureAuthenticationForWebsite": "false",
-                                    "AppPoolNameForWebsite": "",
-                                    "DotNetVersionForWebsite": "v4.0",
-                                    "PipeLineModeForWebsite": "Integrated",
-                                    "AppPoolIdentityForWebsite": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForWebsite": "",
-                                    "AppPoolPasswordForWebsite": "",
-                                    "AnonymousAuthenticationForWebsite": "false",
-                                    "BasicAuthenticationForWebsite": "false",
-                                    "WindowsAuthenticationForWebsite": "true",
-                                    "ParentWebsiteNameForVD": "",
-                                    "VirtualPathForVD": "",
-                                    "PhysicalPathForVD": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "VDPhysicalPathAuth": "VDUserPassThrough",
-                                    "VDAuthUserName": "",
-                                    "VDAuthUserPassword": "",
-                                    "ParentWebsiteNameForApplication": "",
-                                    "VirtualPathForApplication": "",
-                                    "PhysicalPathForApplication": "%SystemDrive%\\inetpub\\wwwroot",
-                                    "ApplicationPhysicalPathAuth": "ApplicationUserPassThrough",
-                                    "ApplicationAuthUserName": "",
-                                    "ApplicationAuthUserPassword": "",
-                                    "CreateOrUpdateAppPoolForApplication": "false",
-                                    "AppPoolNameForApplication": "",
-                                    "DotNetVersionForApplication": "v4.0",
-                                    "PipeLineModeForApplication": "Integrated",
-                                    "AppPoolIdentityForApplication": "ApplicationPoolIdentity",
-                                    "AppPoolUsernameForApplication": "",
-                                    "AppPoolPasswordForApplication": "",
-                                    "AppPoolName": "",
-                                    "DotNetVersion": "v4.0",
-                                    "PipeLineMode": "Integrated",
-                                    "AppPoolIdentity": "ApplicationPoolIdentity",
-                                    "AppPoolUsername": "",
-                                    "AppPoolPassword": "",
-                                    "StartStopRecycleAppPoolName": "",
-                                    "AppCmdCommands": ""
+                                    "WebsitePhysicalPath": "$(StoneCo.SiteName)"
                                 }
                             }
                         ]
@@ -701,22 +536,19 @@
                 "description": "Deployment Group: Deploys a IIS Website with BigIp.",
                 "variables": {
                     "F5PartitionName": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     },
                     "F5PartitionNameProduction": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     },
                     "F5PoolName": {
-                        "value": null
-                    },
-                    "StoneCo.MySettingValue": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     },
                     "StoneCo.SiteDirectory": {
                         "value": "C:\\inetpub\\PREENCHER_ISSO_AQUI"
                     },
                     "StoneCo.SiteName": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     }
                 },
                 "deployPhases": [
@@ -778,7 +610,7 @@
                                 "inputs": {
                                     "EnableIIS": "false",
                                     "IISDeploymentType": "IISWebsite",
-                                    "ActionIISWebsite": "CreateOrUpdate",
+                                    "ActionIISWebsite": "Create Or Update",
                                     "StartStopWebsiteName": "$(StoneCo.SiteName)",
                                     "WebsiteName": "$(StoneCo.SiteName)",
                                     "WebsitePhysicalPath": "$(StoneCo.SiteDirectory)",
