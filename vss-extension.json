@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.10",
+    "version": "1.1.11",
     "publisher": "cnatan",
     "targets": [
         {
@@ -35,16 +35,13 @@
                 "description": "Deployment Group: Deploys a Windows Service using the integration with the BigIP Load Balancer.",
                 "variables": {
                     "F5PartitionName": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     },
                     "F5PoolName": {
-                        "value": null
-                    },
-                    "DatabaseName": {
-                        "value": null
-                    },
+                        "value": "PREENCHER_ISSO_AQUI"
+                    },                
                     "StoneCo.ServiceName": {
-                        "value": null
+                        "value": "PREENCHER_ISSO_AQUI"
                     }
                 },
                 "deployPhases": [
@@ -123,7 +120,7 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "rootDirectory": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release/",
+                                    "rootDirectory": null,
                                     "targetFiles": "*.config",
                                     "encoding": "auto",
                                     "writeBOM": "true",
@@ -149,7 +146,7 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "SourceFolder": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release",
+                                    "SourceFolder": null,
                                     "Contents": "**",
                                     "TargetFolder": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\",
                                     "CleanTargetFolder": "false",
@@ -171,7 +168,7 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "ServiceName": "$(StoneCo.ServiceName)",
-                                    "ServiceBinaryPath": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\WhoAmIWinService.exe",
+                                    "ServiceBinaryPath": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\PREENCHER_ISSO_AQUI",
                                     "InstallationMode": "CustomCommand",
                                     "InstallArguments": "--install",
                                     "ServiceUser": "Default",
@@ -234,17 +231,14 @@
                 "description": "Deployment Group: Deploys a Windows Service.",
                 "variables": {
                     "StoneCo.ServiceName": {
-                        "value": null
-                    },
-                    "StoneCo.DefaultInstalationDir": {
-                        "value": null
-                    }
+                        "value": "PREENCHER_ISSO_AQUI"
+                    }                    
                 },
                 "deployPhases": [
                     {
                         "deploymentInput": {
                             "healthPercent": 0,
-                            "deploymentHealthOption": "OneTargetAtATime",
+                            "deploymentHealthOption": "Custom",
                             "tags": [],
                             "skipArtifactsDownload": false,
                             "artifactsDownloadInput": {
@@ -253,19 +247,19 @@
                             "queueId": 500,
                             "demands": [],
                             "enableAccessToken": false,
-                            "timeoutInMinutes": 2,
+                            "timeoutInMinutes": 0,
                             "jobCancelTimeoutInMinutes": 1,
                             "condition": "succeeded()",
                             "overrideInputs": {}
                         },
                         "rank": 1,
                         "phaseType": 4,
-                        "name": "Deployment phase",
-                        "workflowTasks": [
+                        "name": "Deployment group phase",
+                        "workflowTasks": [                            
                             {
                                 "taskId": "2f321c10-7d4d-46d0-b3a1-f78cc01b8a7c",
                                 "version": "0.*",
-                                "name": "Stop Service Buy4.WhoAmIWinService",
+                                "name": "Stop Service $(StoneCo.ServiceName)",
                                 "refName": "",
                                 "enabled": true,
                                 "alwaysRun": false,
@@ -275,9 +269,9 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "ServiceName": "Buy4.WhoAmIWinService",
-                                    "Timeout": "50",
-                                    "SkipWhenServiceDoesNotExists": "true",
+                                    "ServiceName": "$(StoneCo.ServiceName)",
+                                    "Timeout": "60",
+                                    "SkipWhenServiceDoesNotExists": "false",
                                     "KillService": "true"
                                 }
                             },
@@ -294,7 +288,7 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "rootDirectory": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release/",
+                                    "rootDirectory": null,
                                     "targetFiles": "*.config",
                                     "encoding": "auto",
                                     "writeBOM": "true",
@@ -310,7 +304,7 @@
                             {
                                 "taskId": "5bfb729a-a7c8-4a78-a7c3-8d717bb7c13c",
                                 "version": "2.*",
-                                "name": "Copy Files to: $(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService",
+                                "name": "Copy Files to: $(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\",
                                 "refName": "",
                                 "enabled": true,
                                 "alwaysRun": false,
@@ -320,9 +314,9 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "SourceFolder": "$(System.DefaultWorkingDirectory)/HelloWorld-WinService-Build/drop/WhoAmIWinService/bin/Release",
+                                    "SourceFolder": null,
                                     "Contents": "**",
-                                    "TargetFolder": "$(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService",
+                                    "TargetFolder": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\",
                                     "CleanTargetFolder": "false",
                                     "OverWrite": "false",
                                     "flattenFolders": "false"
@@ -331,7 +325,7 @@
                             {
                                 "taskId": "2f32dc10-7d4d-46d0-b3a1-f78cc01b8a7c",
                                 "version": "0.*",
-                                "name": "Install Service WhoAmIWinService",
+                                "name": "Install Service $(StoneCo.ServiceName)",
                                 "refName": "",
                                 "enabled": true,
                                 "alwaysRun": false,
@@ -341,19 +335,19 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "ServiceName": "WhoAmIWinService",
-                                    "ServiceBinaryPath": "$(StoneCo.DefaultInstalationDir)\\Buy4.WhoAmIWinService\\WhoAmIWinService.exe",
+                                    "ServiceName": "$(StoneCo.ServiceName)",
+                                    "ServiceBinaryPath": "$(DefaultInstalationDir)\\$(StoneCo.ServiceName)\\PREENCHER_ISSO_AQUI",
                                     "InstallationMode": "CustomCommand",
                                     "InstallArguments": "--install",
                                     "ServiceUser": "Default",
-                                    "ServiceAccount": "$(SERVICE_ACCOUNT_USER)",
-                                    "ServicePassword": "$(SERVICE_ACCOUNT_PASSWORD)"
+                                    "ServiceAccount": "",
+                                    "ServicePassword": ""
                                 }
                             },
                             {
                                 "taskId": "2f321c10-7d4d-46d0-b3a1-f78cc01b8a7d",
                                 "version": "0.*",
-                                "name": "Start Service WhoAmIWinService",
+                                "name": "Start Service $(StoneCo.ServiceName)",
                                 "refName": "",
                                 "enabled": true,
                                 "alwaysRun": false,
@@ -363,9 +357,9 @@
                                 "overrideInputs": {},
                                 "condition": "succeeded()",
                                 "inputs": {
-                                    "ServiceName": "WhoAmIWinService"
+                                    "ServiceName": "$(StoneCo.ServiceName)"
                                 }
-                            }
+                            }                            
                         ]
                     }
                 ],
@@ -537,10 +531,7 @@
                 "variables": {
                     "F5PartitionName": {
                         "value": "PREENCHER_ISSO_AQUI"
-                    },
-                    "F5PartitionNameProduction": {
-                        "value": "PREENCHER_ISSO_AQUI"
-                    },
+                    },                    
                     "F5PoolName": {
                         "value": "PREENCHER_ISSO_AQUI"
                     },
