@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Lab Extension",
-    "version": "1.1.11",
+    "version": "1.1.12",
     "publisher": "cnatan",
     "targets": [
         {
