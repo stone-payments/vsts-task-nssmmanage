@@ -31,7 +31,7 @@
             ],
             "properties": {
                 "id": "123dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "Windows Service with BigIP",
+                "name": "[Stone] Windows Service with BigIP",
                 "description": "Deployment Group: Deploys a Windows Service using the integration with the BigIP Load Balancer.",
                 "variables": {
                     "F5PartitionName": {
@@ -121,7 +121,7 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "rootDirectory": null,
-                                    "targetFiles": "*.config",
+                                    "targetFiles": "**\\*.config",
                                     "encoding": "auto",
                                     "writeBOM": "true",
                                     "actionOnMissing": "warn",
@@ -227,7 +227,7 @@
             ],
             "properties": {
                 "id": "124dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "Windows Service",
+                "name": "[Stone] Windows Service",
                 "description": "Deployment Group: Deploys a Windows Service.",
                 "variables": {
                     "StoneCo.ServiceName": {
@@ -289,7 +289,7 @@
                                 "condition": "succeeded()",
                                 "inputs": {
                                     "rootDirectory": null,
-                                    "targetFiles": "*.config",
+                                    "targetFiles": "**\\*.config",
                                     "encoding": "auto",
                                     "writeBOM": "true",
                                     "actionOnMissing": "warn",
@@ -374,7 +374,7 @@
             ],
             "properties": {
                 "id": "125dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "IIS Website",
+                "name": "[Stone] IIS Website",
                 "description": "Deployment Group: Deploys a IIS Website.",
                 "variables": {
                     "StoneCo.SiteDirectory": {
@@ -526,7 +526,7 @@
             ],
             "properties": {
                 "id": "126dd05d-0163-4ba9-8a81-91a13906435f",
-                "name": "IIS Website with BigIp",
+                "name": "[Stone] IIS Website with BigIp",
                 "description": "Deployment Group: Deploys a IIS Website with BigIp.",
                 "variables": {
                     "F5PartitionName": {
