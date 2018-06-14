@@ -13,8 +13,8 @@
   "demands": [],
   "version": {
     "Major": "4",
-    "Minor": "0",
-    "Patch": "34"
+    "Minor": "2",
+    "Patch": "0"
   },
   "minimumAgentVersion": "1.95.0",
   "instanceNameFormat": "NssmManage $(message)",
@@ -303,6 +303,16 @@
         "EditableOptions": "false",
         "PopulateDefaultValue": "true"
       }
+    },
+    {
+      "name": "restartdelay",
+      "type": "string",
+      "label": "App Restart Delay",
+      "defaultValue": "0",
+      "required": false,
+      "groupName": "exitActions",
+      "visibleRule": "recovertaction = Restart",
+      "helpMarkDown": "App restart delay when 'Restart' recover action selected."
     }
   ],
   "execution": {

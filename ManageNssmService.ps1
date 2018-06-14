@@ -172,8 +172,12 @@ function Get-NssmService($serviceName, $remoteSession){
     }
 }
 
-function Set-NssmExitActions ($nssmPath, $serviceName, $recoverAction, $remoteSession) {
+function Set-NssmExitActions ($nssmPath, $serviceName, $recoverAction, $remoteSession, $appRestartDelay) {
     Invoke-Tool -FileName $nssmPath -Arguments "set $serviceName AppExit Default $recoverAction" -RemoteSession $remoteSession
+
+    if($appRestartDelay){
+        Invoke-Tool -FileName $nssmPath -Arguments "set $serviceName AppRestartDelay $appRestartDelay" -RemoteSession $remoteSession
+    }
 }
 
 function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession) {
@@ -212,7 +216,10 @@ function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession
     Set-NssmLogs $nssmPath $serviceName $outFile $errFile $rotate $rotateRunning $rotatePerSeconds $rotatePerBytes $remoteSession
 
     $recoverAction = Get-VstsInput -Name "recovertaction"
-    Set-NssmExitActions $nssmPath $serviceName $recoverAction $remoteSession
+    if($recoverAction -eq "Restart"){
+        $appRestartDelay = Get-VstsInput -Name "restartdelay"
+    }
+    Set-NssmExitActions $nssmPath $serviceName $recoverAction $remoteSession $appRestartDelay
 
     # Apply service desired state.
     switch ($serviceState) {
