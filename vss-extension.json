@@ -2,8 +2,8 @@
     "manifestVersion": 1,
     "id": "nssm-manage",
     "name": "Manage NSSM Service",
-    "version": "1.1.0",
-    "publisher": "cnatan",
+    "version": "1.2.0",
+    "publisher": "stone-co",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
