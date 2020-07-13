@@ -231,8 +231,10 @@ function Set-NssmService ($nssmPath, $serviceName, $serviceState, $remoteSession
         "restarted" {
             Invoke-Tool -FileName $nssmPath -Arguments "restart $serviceName" -RemoteSession $remoteSession
         }
-        "stopped"{
-            Invoke-Tool -FileName $nssmPath -Arguments "stop $serviceName" -RemoteSession $remoteSession
+        "stopped" {
+            If((Get-Service $serviceName -ErrorAction Ignore).Status -ne "Stopped") {
+                Invoke-Tool -FileName $nssmPath -Arguments "stop $serviceName" -RemoteSession $remoteSession
+            }
         }
         Default {
             # Should not execute this. if happen some validation is missing.
