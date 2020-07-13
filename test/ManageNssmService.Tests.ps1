@@ -391,3 +391,51 @@ Describe 'Invoke-RemoteTool' {
         }
     }
 }
+
+Describe 'Set-NssmService' {
+    Mock Write-Host {}
+    $serviceName = "MyTestService"
+
+    Context 'When $serviceState = stopped' {
+        Mock Get-VstsInput {}
+        Mock Get-NssmService {}
+        Mock Install-NssmService {}
+        Mock Set-NssmAppProperties {}
+        Mock Set-NssmDetails {}
+        Mock Set-NssmLogOn {}
+        Mock Set-NssmLogs {}
+        Mock Set-NssmExitActions {}
+        Mock Invoke-Tool {}
+
+        $service = [pscustomobject]@{
+            Status          = "TempStatus"
+            Name            = $serviceName
+            DisplayName     = 'My Mocked Test Service'
+        }
+        Mock Get-Service { Return $service; } -ParameterFilter { $Name -eq $serviceName }
+
+        It 'Given Running service, must stop the service' {
+            # Arrange
+            $service.Status = "Running";
+
+            # Act
+            Set-NssmService -NssmPath "NSSMPATH" -ServiceName $serviceName -ServiceState "stopped" -RemoteSession $NULL;
+            
+            # Assert
+            Assert-MockCalled Get-Service -Exactly -Times 1 -Scope It;
+            Assert-MockCalled Invoke-Tool -ParameterFilter { $Arguments -eq "stop $ServiceName"; } -Exactly -Times 1 -Scope It;
+        }
+
+        It 'Given Stopped service, must do nothing' {
+            # Arrange
+            $service.Status = "Stopped";
+
+            # Act
+            Set-NssmService -NssmPath "NSSMPATH" -ServiceName $serviceName -ServiceState "stopped" -RemoteSession $NULL;
+            
+            # Assert
+            Assert-MockCalled Get-Service -Exactly -Times 1 -Scope It;
+            Assert-MockCalled Invoke-Tool -ParameterFilter { $Arguments -eq "stop $ServiceName"; } -Exactly -Times 0 -Scope It;
+        }
+    }
+}
