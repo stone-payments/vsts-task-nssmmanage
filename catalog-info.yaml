@@ -1,0 +1,30 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: azdevops-nssm-task
+  title: Azure Pipelines NSSM Manager Task
+  description: Azure Pipeline Task to manage NSSM Windows Services
+  namespace: stone
+  annotations:
+    legacy.stone.tech/owner-email: cnatan@stone.com.br
+    legacy.stone.tech/prod-date: "2018-03-01"
+    stone.tech/cloud-accounts: azure/infra-non-prod
+    stone.tech/on-prem-sites: atlanta1
+  labels:
+    legacy.stone.tech/internal-user-auth-base: not-applicable
+    legacy.stone.tech/access-request-type: service-now-stone
+    legacy.stone.tech/handle-lgpd: "false"
+    legacy.stone.tech/customer-auth-method: not-applicable
+    stone.tech/endpoint-type: none
+  links:
+    - url: https://github.com/platform-test-org/actions/deploy
+      title: CD Pipeline
+    - url: https://newrelic.com/stone/my-app
+      title: Monitoring
+    - url: https://pagerduty.com/stone/myservice
+      title: Incident Manager
+spec:
+  type: service
+  lifecycle: experimental
+  owner: group:stone-payments/platform-squad-writer
+  
