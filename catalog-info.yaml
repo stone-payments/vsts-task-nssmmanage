@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+    name: vsts-task-nssmmanage
+    title: VSTS Task and Scripts
+    description: VSTS Manage NSSM Service task and scripts. Install and edit windows services through nssm.
+    namespace: stone
+    tags:
+        - powershell
+        - vsts
+        - iac-library
+    annotations:
+      legacy.stone.tech/owner-email: foundation.platform@stone.com.br
+spec:
+    type: library
+    lifecycle: production
+    owner: stone-payments/foundation-platform-experience
